@@ -15,6 +15,7 @@ service Upload {
     rpc UploadPart(stream UploadPartRequest) returns (stream UploadPartResponse) {}
     rpc UploadComplete(UploadCompleteRequest) returns (UploadCompleteResponse) {}
     rpc UploadAbort(UploadAbortRequest) returns (UploadAbortResponse) {}
+    rpc DeleteObjects(DeleteObjectsRequest) returns (DeleteObjectsResponse) {}
 }
 
 // UploadMediaRequest is the request for media upload
@@ -27,12 +28,15 @@ message UploadMediaRequest {
 
     // The bucket to upload the file to
     string bucket = 3;
+
+    // The mime-type of the file.
+    string contentType = 4;
 }
 
 // UploadMediaResponse is the response for media upload
 message UploadMediaResponse {
     // The location that the file was uploaded to
-    string output = 1;
+    string location = 1;
 }
 
 // UploadMultipartRequest is the request for multipart upload
@@ -48,6 +52,9 @@ message UploadMultipartRequest {
 
     // The bucket to upload the file to
     string bucket = 4;
+
+    // The mime-type of the file.
+    string contentType = 5;
 }
 
 // UploadMultipartResponse is the response for multipart upload
@@ -66,6 +73,9 @@ message UploadInitRequest {
 
     // File metadata
     map<string, string> metadata = 3;
+
+    // The mime-type of the file.
+    string contentType = 4;
 }
 
 // UploadInitResponse is the response for initiating resumable upload
@@ -121,9 +131,10 @@ message UploadCompleteRequest {
 
 // UploadCompleteResponse is the response for completing resumable upload
 message UploadCompleteResponse {
-    // The location that the file was uploaded to
-    string location = 1;
-
+    // The size that the uploaded file
+    int64 ContentLength = 1;
+    // The type of the uploaded file
+    string ContentType = 2;
 }
 
 // UploadAbortRequest is the request for aborting resumable upload
@@ -141,4 +152,22 @@ message UploadAbortRequest {
 // UploadAbortResponse is the response for aborting resumable upload
 message UploadAbortResponse {
     bool status = 1;
+}
+
+// DeleteObjectsRequest is the request for deleting objects.
+message DeleteObjectsRequest {
+    // The bucket to delete the objects from.
+    string bucket = 1;
+
+    // The object keys to be deleted from s3.
+    repeated string keys = 2;
+}
+
+// DeleteObjectsResponse is the response for deleting objects.
+message DeleteObjectsResponse {
+    // The object keys that deleted successfully.
+    repeated string deleted = 1;
+
+    // The object keys that failed to delete.
+    repeated string failed = 2;
 }
